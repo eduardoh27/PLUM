@@ -104,13 +104,14 @@ def main():
     # ETAPA 2: RECOLECCION DE DATOS
     
     #data = glob(os.path.join('data','*.png'))
-    data = sorted(glob(os.path.join('data', 'ActB_Yopal', 'img*.png')), key=sort_key_func)
+    data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
+    #print(data)
     
     # proceso respecto al tiempo
     for t, ruta_imagen in enumerate(data):
         im = io.imread(ruta_imagen)
         # se recorta la imagen
-        im = im[135:345, 120:570, :] # imagen recortada
+        im = im[135:345, 120:570, :] # imagen recortada     
         
         # estoy en una imagen especifica en un determinado t
         for celda in celdas_datos.keys():
@@ -120,7 +121,7 @@ def main():
             img_celda = obtener_celda(im, i, j, alto_celda, ancho_celda)
             valor = calcular_intensidad_promedio(img_celda, circulo)
             celdas_datos[celda][1].append(valor)
-    print(celdas_datos)
+    #print(celdas_datos)
 
 
     # ETAPA 3: GRAFICAR CADA CELDA CON FUNCIÓN DEL TIEMPO
@@ -135,5 +136,6 @@ if __name__ == "__main__":
     
 # TODO: garantizar una sola detección en get_circle
 # TODO: intensidad en solo canal verde?
-# TODO: nos interesan el control pos y control neg?
 # TODO: tomar solo intensidades mayores?
+# TODO: threshold
+# TODO: graficar controlPos y controlNeg
