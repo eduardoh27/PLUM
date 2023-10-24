@@ -12,6 +12,3 @@ class Celda:
 
     def __str__(self):
         return f"Celda: tipo = {self.tipo}, coordenada = {self.coordenada}, circulo = {self.circulo}, intensidades = {self.intensidades}"
-
-    # Puedes agregar otros métodos que sean útiles para operaciones específicas con la celda
-    # Por ejemplo, métodos para obtener la intensidad promedio, detectar el círculo, etc.

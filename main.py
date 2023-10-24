@@ -15,7 +15,6 @@ def obtener_imagen_celda(img, i, j, alto_celda, ancho_celda): # fila, columna (e
         new_img = img[int(alto_celda*(i-1)):int(alto_celda*i), int(ancho_celda*(j-1)):int(ancho_celda*j)]        
     return new_img
 
-
 # Función que detecta los círculos en la imagen. Se deben tunear param1 y param2 para reducir FN y/o FP. 
 # Así mismo, minRadius y maxRadius se tunean dependiendo del tamaño de la grilla y muestras utilizadas. 
 def obtener_circulos(imagen, param1=100, param2=8, minRadius=10, maxRadius=16, plotear=False):
@@ -75,7 +74,6 @@ def sort_key_func(item):
     return int(item.split('_')[-1].split('.png')[0])
 
 def main():
-
     # ETAPA 1: DETECCION DE CELDAS
     # pedir al usuario las celdas seleccionadas
     coordenadas_seleccionadas = interfaz.main()
@@ -140,22 +138,22 @@ if __name__ == "__main__":
     data = '' # variable que representa el set de imagenes
     main()
     
-# TODO: garantizar una sola detección en get_circle
-# TODO: intensidad en solo canal verde?
+# AL FINAL
+# TODO: lanzar como un ejecutable (.exe) para comodidad en vez de tener que instalar librerías y ejecutar desde consola 
+# TODO: al final del proyecto: revisar versiones de librerías y colocarlas en requirements.txt
+# TODO: añadir licencia
 
 # TODO: tomar solo intensidades mayores
 # TODO: calcular y graficar threshold (pedir un porcentaje al usuario)
 # TODO: graficar controlPos y controlNeg
 # TODO: reducir ruido
-# TODO: requirements.txt
 # TODO: interfaz sea user-friendly
 # TODO: dos CP y dos CN
-# TODO: usar POO? para clase celda (con posicion y tipo) # preguntarle a Chat si lo recomienda
 # TODO: comentar adecuadamente el código
-# TODO: añadir licencia
 # TODO: comprobar grafica con ejemplo de dataset
 # TODO: importar información a Excel
 # TODO: permitir múltiples CP y CN
+# TODO: garantizar una sola detección en get_circle
 # TODO: manejo de errores: si no se detecta un único circulo        
-# TODO: al final del proyecto: revisar versiones de librerías y colocarlas en requirements
 # TODO: permitir nombrar? cada celda seleccionada
+# TODO: intensidad en solo canal verde?
