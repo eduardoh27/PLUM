@@ -5,10 +5,10 @@ import cv2
 from glob import glob
 import os
 import interfaz
-
+from celda import Celda
 
 # Función que devuelve la sección de la imagen correspondiente a la muestra en la posición (i, j) de la grilla
-def obtener_celda(img, i, j, alto_celda, ancho_celda): # fila, columna (empieza en 1)
+def obtener_imagen_celda(img, i, j, alto_celda, ancho_celda): # fila, columna (empieza en 1)
     if len(img.shape) == 3:
         new_img = img[int(alto_celda*(i-1)):int(alto_celda*i), int(ancho_celda*(j-1)):int(ancho_celda*j), :]
     elif len(img.shape) == 2:
@@ -18,7 +18,7 @@ def obtener_celda(img, i, j, alto_celda, ancho_celda): # fila, columna (empieza 
 
 # Función que detecta los círculos en la imagen. Se deben tunear param1 y param2 para reducir FN y/o FP. 
 # Así mismo, minRadius y maxRadius se tunean dependiendo del tamaño de la grilla y muestras utilizadas. 
-def obtener_circulos(imagen, param1=100, param2=8, minRadius=10, maxRadius=16, imprimir=False):
+def obtener_circulos(imagen, param1=100, param2=8, minRadius=10, maxRadius=16, plotear=False):
     
     # se copia para no alterar la imagen original
     imagen = imagen.copy()
@@ -36,7 +36,7 @@ def obtener_circulos(imagen, param1=100, param2=8, minRadius=10, maxRadius=16, i
             cv2.circle(imagen, (i[0], i[1]), i[2], (0, 255, 0), 2)
             cv2.circle(imagen, (i[0], i[1]), 2, (0, 0, 255), 3)
 
-    if imprimir:
+    if plotear:
         plt.imshow(imagen)
         plt.show()
 
@@ -53,16 +53,16 @@ def calcular_intensidad_promedio(img, circulo):
     #plot(segmento)
     return np.mean(segmento) # canal G
 
-def graficar_intensidad_tiempo(celdas_datos):
+def graficar_intensidad_tiempo(celdas):
     """
     Función que grafica la intensidad promedio de cada celda en función del tiempo.
     """
     plt.figure(figsize=(12, 8))
     
     # Por cada celda en celdas_datos
-    for celda, datos in celdas_datos.items():
-        intensidades = datos[1]
-        plt.plot(intensidades, label=f"Celda {celda}")
+    for celda in celdas:
+        intensidades = celda.intensidades
+        plt.plot(intensidades, label=f"Celda {celda.coordenada}, {celda.tipo}")
     
     plt.title("Intensidad promedio por celda en función del tiempo")
     plt.xlabel("Tiempo")
@@ -74,17 +74,26 @@ def graficar_intensidad_tiempo(celdas_datos):
 def sort_key_func(item):
     return int(item.split('_')[-1].split('.png')[0])
 
-
 def main():
 
     # ETAPA 1: DETECCION DE CELDAS
     # pedir al usuario las celdas seleccionadas
-    celdas_seleccionadas = interfaz.main()['Celdas']
-    print(celdas_seleccionadas)
-    #celdas_seleccionadas = [(1,1), (1,2)]
-    # se inicializa la estructura con la información de cada celda en el tiempo
-    celdas_datos = {celda:[None,[]] for celda in celdas_seleccionadas} #celdas_data = {(1,1):[None,[]], (1,2):[None,[]]}
- 
+    coordenadas_seleccionadas = interfaz.main()
+    print(coordenadas_seleccionadas)
+    
+    celdas = []
+
+    for tipo, coordenadas in coordenadas_seleccionadas.items():
+        if coordenadas is not None:
+            if type(coordenadas) == list:
+                for coordenada in coordenadas:
+                    nueva_celda = Celda(tipo, coordenada)
+                    celdas.append(nueva_celda)
+            # esto pasa cuando CP o CN solo puedo tener un valor, y no está en un singleton sino que es una tupla.
+            elif type(coordenadas) == tuple:
+                nueva_celda = Celda(tipo, coordenadas)
+                celdas.append(nueva_celda)
+
     # se obtiene la imagen inicial en gris porque se requiere para la detección de circulos
     img_inicial_gris = io.imread('img_44.PNG', as_gray=True) 
     img_inicial_gris = img_inicial_gris[135:345, 120:570] # imagen recortada
@@ -94,37 +103,35 @@ def main():
     
 
     # para cada celda seleccionada, detectar el circulo correspondiente
-    for celda in celdas_datos.keys():
-        i, j = celda
-        img_celda = obtener_celda(img_inicial_gris, i, j, alto_celda, ancho_celda)
-        circulo = obtener_circulos(img_celda, imprimir=False)
-        celdas_datos[celda][0] = circulo
-    
+    for celda in celdas:
+        i, j = celda.coordenada
+        img_celda = obtener_imagen_celda(img_inicial_gris, i, j, alto_celda, ancho_celda)
+        circulo = obtener_circulos(img_celda, plotear=False)
+        celda.circulo = circulo
     
     # ETAPA 2: RECOLECCION DE DATOS
     
     #data = glob(os.path.join('data','*.png'))
     data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
-    #print(data)
     
     # proceso respecto al tiempo
-    for t, ruta_imagen in enumerate(data):
+    #for t, ruta_imagen in enumerate(data): # útil en caso de necesitar el tiempo (discreto empezando en 0) de cada imagen en el dataset
+    for ruta_imagen in data:
         im = io.imread(ruta_imagen)
-        # se recorta la imagen
+        # se recorta la imagen 
         im = im[135:345, 120:570, :] # imagen recortada     
         
         # estoy en una imagen especifica en un determinado t
-        for celda in celdas_datos.keys():
+        for celda in celdas:
             # obtener los valores de la imagen consultando el circulo
-            circulo = celdas_datos[celda][0]
-            i, j = celda
-            img_celda = obtener_celda(im, i, j, alto_celda, ancho_celda)
+            circulo = celda.circulo
+            i, j = celda.coordenada
+            img_celda = obtener_imagen_celda(im, i, j, alto_celda, ancho_celda)
             valor = calcular_intensidad_promedio(img_celda, circulo)
-            celdas_datos[celda][1].append(valor)
+            celda.agregar_intensidad(valor)
 
     # ETAPA 3: GRAFICAR CADA CELDA CON FUNCIÓN DEL TIEMPO
-    graficar_intensidad_tiempo(celdas_datos)
-
+    graficar_intensidad_tiempo(celdas)
 
 
 if __name__ == "__main__":
@@ -142,3 +149,13 @@ if __name__ == "__main__":
 # TODO: reducir ruido
 # TODO: requirements.txt
 # TODO: interfaz sea user-friendly
+# TODO: dos CP y dos CN
+# TODO: usar POO? para clase celda (con posicion y tipo) # preguntarle a Chat si lo recomienda
+# TODO: comentar adecuadamente el código
+# TODO: añadir licencia
+# TODO: comprobar grafica con ejemplo de dataset
+# TODO: importar información a Excel
+# TODO: permitir múltiples CP y CN
+# TODO: manejo de errores: si no se detecta un único circulo        
+# TODO: al final del proyecto: revisar versiones de librerías y colocarlas en requirements
+# TODO: permitir nombrar? cada celda seleccionada

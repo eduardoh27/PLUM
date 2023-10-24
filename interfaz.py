@@ -96,7 +96,6 @@ class App:
         return results
 
 
-
 def main():
     root = tk.Tk()
     app = App(root)
