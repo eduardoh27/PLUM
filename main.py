@@ -49,7 +49,7 @@ def plot(img):
 
 def calcular_intensidad_promedio(img, circulo):
     i, j, r = circulo
-    segmento = img[j-r:j+r, i-r:i+r]
+    segmento = img[j-r:j+r, i-r:i+r]    
     #plot(segmento)
     return np.mean(segmento) # canal G
 
@@ -121,11 +121,10 @@ def main():
             img_celda = obtener_celda(im, i, j, alto_celda, ancho_celda)
             valor = calcular_intensidad_promedio(img_celda, circulo)
             celdas_datos[celda][1].append(valor)
-    #print(celdas_datos)
-
 
     # ETAPA 3: GRAFICAR CADA CELDA CON FUNCIÓN DEL TIEMPO
     graficar_intensidad_tiempo(celdas_datos)
+
 
 
 if __name__ == "__main__":
@@ -136,6 +135,8 @@ if __name__ == "__main__":
     
 # TODO: garantizar una sola detección en get_circle
 # TODO: intensidad en solo canal verde?
-# TODO: tomar solo intensidades mayores?
-# TODO: threshold
+
+# TODO: tomar solo intensidades mayores
+# TODO: calcular y graficar threshold
 # TODO: graficar controlPos y controlNeg
+# TODO: reducir ruido
