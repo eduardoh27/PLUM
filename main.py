@@ -137,6 +137,8 @@ if __name__ == "__main__":
 # TODO: intensidad en solo canal verde?
 
 # TODO: tomar solo intensidades mayores
-# TODO: calcular y graficar threshold
+# TODO: calcular y graficar threshold (pedir un porcentaje al usuario)
 # TODO: graficar controlPos y controlNeg
 # TODO: reducir ruido
+# TODO: requirements.txt
+# TODO: interfaz sea user-friendly
