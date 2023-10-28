@@ -23,7 +23,7 @@ class App:
         self.ensayo_btn = tk.Button(self.root, text="Ensayo", width=10, height=2, command=lambda: self.set_mode("Ensayo"))
         self.ensayo_btn.grid(row=2, column=9)
 
-        dimention_x, dimention_y = 8, 4
+        dimention_x, dimention_y = 9, 5
 
         # Crear botones para las celdas
         for i in range(dimention_y):

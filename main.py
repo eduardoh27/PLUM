@@ -39,6 +39,13 @@ def obtener_circulos(imagen, param1=100, param2=8, minRadius=10, maxRadius=16, p
         plt.imshow(imagen)
         plt.show()
 
+    if len(circulos) > 1:
+        print('Se detectaron más de un circulo')
+        return None
+    elif len(circulos) == 0:
+        print('No se detectaron circulos')
+        return None
+
     return circulos[0,0]
 
 def plot(img):
@@ -46,11 +53,23 @@ def plot(img):
     plt.axis('off') 
     plt.show()
 
-def calcular_intensidad_promedio(img, circulo):
+def calcular_intensidad(img, circulo, metodo = None):
     i, j, r = circulo
-    segmento = img[j-r:j+r, i-r:i+r]    
-    #plot(segmento)
-    return np.mean(segmento) # canal G
+    # se toma la ventana de interes (el cuadrado que enmarca el circulo detectado)
+    ventana = img[j-r:j+r, i-r:i+r, 1] # solo se toman las intensidades del canal G (verde)
+    #plot(ventana)
+    intensidades_ordenadas = np.sort(ventana.flatten())
+    intensidad = 0  
+    
+    if metodo == 'media':    
+        intensidad = np.mean(intensidades_ordenadas)
+    elif metodo == 'maximo':
+        intensidad = intensidades_ordenadas[-1]
+    else:
+        # se toma el promedio de la mitad mayor de las intensidades ordenadas
+        intensidad = np.mean(intensidades_ordenadas[len(intensidades_ordenadas)//2:])
+
+    return intensidad
 
 def graficar_intensidad_tiempo(celdas):
     """
@@ -66,7 +85,7 @@ def graficar_intensidad_tiempo(celdas):
     plt.title("Intensidad promedio por celda en función del tiempo")
     plt.xlabel("Tiempo")
     plt.ylabel("Intensidad promedio")
-    plt.legend(loc="upper right")
+    plt.legend(loc="best")
     plt.grid(True)
     plt.show()
 
@@ -74,6 +93,20 @@ def sort_key_func(item):
     return int(item.split('_')[-1].split('.png')[0])
 
 def main():
+
+    #PARAMETROS MANUALES
+    
+    # Para una gradilla 4x8 eran:
+    # pixel_x_1, pixel_y_1 = 120, 135 # esquina superior izquierda de la imagen recortada
+    # pixel_x_2, pixel_y_2 = 375, 345 # esquina inferior derecha de la imagen recortada
+    #img_inicial_gris = img_inicial_gris[135:345, 120:570] # imagen recortada
+    pixel_x_1, pixel_y_1 = 120, 80 # esquina superior izquierda de la imagen recortada
+    pixel_x_2, pixel_y_2 = 620, 345 # esquina inferior derecha de la imagen recortada
+    dimension_x, dimension_y = 9, 5 # dimensiones de la grilla de muestras (8 columnas y 4 filas)
+
+    data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
+
+
     # ETAPA 1: DETECCION DE CELDAS
     # pedir al usuario las celdas seleccionadas
     coordenadas_seleccionadas = interfaz.main()
@@ -93,9 +126,8 @@ def main():
                 celdas.append(nueva_celda)
 
     # se obtiene la imagen inicial en gris porque se requiere para la detección de circulos
-    img_inicial_gris = io.imread('img_44.PNG', as_gray=True) 
-    img_inicial_gris = img_inicial_gris[135:345, 120:570] # imagen recortada
-    dimension_x, dimension_y = 8, 4 # dimensiones de la grilla de muestras (8 columnas y 4 filas)
+    img_inicial_gris = io.imread(data[0], as_gray=True) 
+    img_inicial_gris = img_inicial_gris[pixel_y_1:pixel_y_2, pixel_x_1:pixel_x_2] # imagen recortada
     alto_img, ancho_img = img_inicial_gris.shape[0], img_inicial_gris.shape[1] # ancho y alto (en pixeles) de la imagen recortada
     alto_celda, ancho_celda = (alto_img/dimension_y), (ancho_img/dimension_x)
     
@@ -110,22 +142,25 @@ def main():
     # ETAPA 2: RECOLECCION DE DATOS
     
     #data = glob(os.path.join('data','*.png'))
-    data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
+    #data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
     
     # proceso respecto al tiempo
     #for t, ruta_imagen in enumerate(data): # útil en caso de necesitar el tiempo (discreto empezando en 0) de cada imagen en el dataset
     for ruta_imagen in data:
         im = io.imread(ruta_imagen)
+        #print(im.shape)
         # se recorta la imagen 
-        im = im[135:345, 120:570, :] # imagen recortada     
-        
+
+        im = im[pixel_y_1:pixel_y_2, pixel_x_1:pixel_x_2, :] # imagen recortada     
+        #print(im.shape)
         # estoy en una imagen especifica en un determinado t
         for celda in celdas:
             # obtener los valores de la imagen consultando el circulo
             circulo = celda.circulo
             i, j = celda.coordenada
             img_celda = obtener_imagen_celda(im, i, j, alto_celda, ancho_celda)
-            valor = calcular_intensidad_promedio(img_celda, circulo)
+            #print(img_celda.shape)
+            valor = calcular_intensidad(img_celda, circulo)
             celda.agregar_intensidad(valor)
 
     # ETAPA 3: GRAFICAR CADA CELDA CON FUNCIÓN DEL TIEMPO
@@ -133,9 +168,6 @@ def main():
 
 
 if __name__ == "__main__":
-    celdas_seleccionadas = '' 
-    celdas_datos = '' # variable que con la infomración de cada celda # {(i1,j1): [circulo, []], (i2,j2): [], ...]
-    data = '' # variable que representa el set de imagenes
     main()
     
 # AL FINAL
