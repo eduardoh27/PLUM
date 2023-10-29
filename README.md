@@ -1,4 +1,4 @@
-# Proyecto-PLUM
+# PLUM
 
 Para ejecutar la aplicación, se debe ejecutar el archivo main.py
 Antes de poder ejecutar la aplicación, asegurarse de tener instalado Python y los paquetes que se encuentran en requirements.txt
