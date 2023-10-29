@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 from glob import glob
 import os
-import interfaz
+import interfaz as interfaz
 from celda import Celda
 
 # Función que devuelve la sección de la imagen correspondiente a la muestra en la posición (i, j) de la grilla
@@ -157,7 +157,7 @@ def main():
     dimension_x, dimension_y = 9, 5 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
 
     data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
-
+    print(data)
 
     # ETAPA 1: DETECCION DE CELDAS
     # pedir al usuario las celdas seleccionadas
