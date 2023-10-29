@@ -34,10 +34,11 @@ class App:
 
         # Botones de control
         self.ok_btn = tk.Button(self.root, text="OK", command=self.ok_pressed)
-        self.ok_btn.grid(row=4, column=3, columnspan=2)
+        self.ok_btn.grid(row=dimention_y, column=3, columnspan=2)
         
         self.back_btn = tk.Button(self.root, text="Regresar", command=self.reset_selection)
-        self.back_btn.grid(row=4, column=5, columnspan=2)
+        self.back_btn.grid(row=dimention_y, column=5, columnspan=2)
+
 
     def set_mode(self, mode):
         self.mode = mode
@@ -96,12 +97,62 @@ class App:
         return results
 
 
+class DialogoNumeroTratamientos(tk.Toplevel):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.resultado = None
+        tk.Label(self, text="¿Cuántos tratamientos va a analizar?").pack(pady=20)
+        tk.Button(self, text="1 Tratamiento", command=lambda: self.set_result(1)).pack(side=tk.LEFT, padx=20)
+        tk.Button(self, text="2 Tratamientos", command=lambda: self.set_result(2)).pack(side=tk.RIGHT, padx=20)
+
+    def set_result(self, valor):
+        self.resultado = valor
+        self.destroy()
+
 def main():
     root = tk.Tk()
-    app = App(root)
-    root.mainloop()
-    return app.get_selected_cells()
+    root.withdraw()  # Ocultar la ventana principal
 
+    # Crear y mostrar el diálogo
+    dialogo = DialogoNumeroTratamientos(root)
+    root.wait_window(dialogo)
+
+    # Comprobar si se ha establecido un resultado
+    if dialogo.resultado is None:
+        print("No se seleccionó ningún número de tratamientos. Saliendo.")
+        return
+
+    num_tratamientos = dialogo.resultado
+
+    # Mostrar la ventana principal
+    root.deiconify()
+    
+    app = App(root)
+    resultados = {}
+
+    for tratamiento in range(1, num_tratamientos + 1):
+        # Restablecer selecciones previas
+        app.reset_selection()
+
+        # Mostrar mensaje para seleccionar celdas del tratamiento actual
+        messagebox.showinfo("Información", f"Seleccione las celdas del tratamiento {tratamiento}")
+
+        root.mainloop()
+        
+        # Almacenar resultados
+        resultados[f"Tratamiento {tratamiento}"] = app.get_selected_cells()
+
+    # Imprimir resultados
+    for tratamiento, celdas in resultados.items():
+        print(tratamiento)
+        print("Celdas seleccionadas:", celdas["Celdas"])
+        if celdas["Control Positivo"]:
+            print("Control Positivo:", celdas["Control Positivo"])
+        if celdas["Control Negativo"]:
+            print("Control Negativo:", celdas["Control Negativo"])
+        print()
+
+    return resultados
 
 if __name__ == "__main__":
     main()
