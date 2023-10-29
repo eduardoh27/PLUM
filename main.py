@@ -55,9 +55,8 @@ def plot(img):
 
 def calcular_intensidad(img, circulo, metodo = None):
     i, j, r = circulo
-    # se toma la ventana de interes (el cuadrado que enmarca el circulo detectado)
+    # se toma la ventana de interes (el cuadrado que enmarca el circulo detectado):
     ventana = img[j-r:j+r, i-r:i+r, 1] # solo se toman las intensidades del canal G (verde)
-    #plot(ventana)
     intensidades_ordenadas = np.sort(ventana.flatten())
     intensidad = 0  
     
@@ -65,6 +64,10 @@ def calcular_intensidad(img, circulo, metodo = None):
         intensidad = np.mean(intensidades_ordenadas)
     elif metodo == 'maximo':
         intensidad = intensidades_ordenadas[-1]
+    elif metodo == 'minimo':
+        intensidad = intensidades_ordenadas[0]
+    elif metodo == 'mediana':
+        intensidad = intensidades_ordenadas[len(intensidades_ordenadas)//2]
     else:
         # se toma el promedio de la mitad mayor de las intensidades ordenadas
         intensidad = np.mean(intensidades_ordenadas[len(intensidades_ordenadas)//2:])
@@ -98,11 +101,12 @@ def main():
     
     # Para una gradilla 4x8 eran:
     # pixel_x_1, pixel_y_1 = 120, 135 # esquina superior izquierda de la imagen recortada
-    # pixel_x_2, pixel_y_2 = 375, 345 # esquina inferior derecha de la imagen recortada
-    #img_inicial_gris = img_inicial_gris[135:345, 120:570] # imagen recortada
+    # pixel_x_2, pixel_y_2 = 570, 345 # esquina inferior derecha de la imagen recortada
+    # dimension_x, dimension_y = 8, 4 # dimensiones de la grilla de muestras (8 columnas y 4 filas)
+
     pixel_x_1, pixel_y_1 = 120, 80 # esquina superior izquierda de la imagen recortada
     pixel_x_2, pixel_y_2 = 620, 345 # esquina inferior derecha de la imagen recortada
-    dimension_x, dimension_y = 9, 5 # dimensiones de la grilla de muestras (8 columnas y 4 filas)
+    dimension_x, dimension_y = 9, 5 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
 
     data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
 
@@ -183,9 +187,9 @@ if __name__ == "__main__":
 # TODO: dos CP y dos CN
 # TODO: comentar adecuadamente el código
 # TODO: comprobar grafica con ejemplo de dataset
-# TODO: importar información a Excel
 # TODO: permitir múltiples CP y CN
 # TODO: garantizar una sola detección en get_circle
 # TODO: manejo de errores: si no se detecta un único circulo        
 # TODO: permitir nombrar? cada celda seleccionada
 # TODO: intensidad en solo canal verde?
+# TODO: exportar información a Excel
