@@ -133,7 +133,7 @@ def graficar_intensidad_tiempo(celdas):
 
 def sort_key_func(item):
     """
-    Función auxiliar para ordenar imágenes basadas en su nombre.
+    Función auxiliar para ordenar imágenes basadas en su número ascendentemente.
     
     :param item: Nombre del archivo de imagen.
     :return: Orden de la imagen.
