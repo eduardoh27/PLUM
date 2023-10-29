@@ -143,14 +143,16 @@ def main():
         resultados[f"Tratamiento {tratamiento}"] = app.get_selected_cells()
 
     # Imprimir resultados
-    for tratamiento, celdas in resultados.items():
-        print(tratamiento)
-        print("Celdas seleccionadas:", celdas["Celdas"])
-        if celdas["Control Positivo"]:
-            print("Control Positivo:", celdas["Control Positivo"])
-        if celdas["Control Negativo"]:
-            print("Control Negativo:", celdas["Control Negativo"])
-        print()
+    imprimir = False
+    if imprimir:
+        for tratamiento, celdas in resultados.items():
+            print(tratamiento)
+            print("Celdas seleccionadas:", celdas["Celdas"])
+            if celdas["Control Positivo"]:
+                print("Control Positivo:", celdas["Control Positivo"])
+            if celdas["Control Negativo"]:
+                print("Control Negativo:", celdas["Control Negativo"])
+            print()
 
     return resultados
 

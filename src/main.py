@@ -110,7 +110,7 @@ def calcular_intensidad(img, circulo, metodo = None):
 
     return intensidad
 
-def graficar_intensidad_tiempo(celdas):
+def graficar_intensidad_tiempo_deprecated(celdas, numero_tratamientos):
     """
     Grafica la intensidad de cada celda en función del tiempo.
     
@@ -131,6 +131,48 @@ def graficar_intensidad_tiempo(celdas):
     plt.grid(True)
     plt.show()
 
+def graficar_intensidad_tiempo(celdas, numero_tratamientos):
+    """
+    Grafica la intensidad de cada celda en función del tiempo.
+    
+    :param celdas: Lista de celdas con sus respectivas intensidades a lo largo del tiempo.
+    :param numero_tratamientos: Número de tratamientos.
+    """
+    
+    if numero_tratamientos not in [1, 2]:
+        print("Número de tratamientos no soportado.")
+        return
+    
+    # Segmentar celdas por tratamiento
+    celdas_por_tratamiento = {f"Tratamiento {i+1}": [] for i in range(numero_tratamientos)}
+    
+    for celda in celdas:
+        celdas_por_tratamiento[celda.tratamiento].append(celda)
+    
+    for tratamiento in celdas_por_tratamiento:
+        plt.figure(figsize=(12, 8))
+
+        maximo_control_positivo = None
+        maximo_control_negativo = None
+
+        for celda in celdas_por_tratamiento[tratamiento]:
+            if celda.tipo == 'Control Positivo':
+                #maximo_control_positivo = max(maximo_control_positivo, max(celda.intensidades))
+                maximo_control_positivo = np.max(celda.intensidades)
+            elif celda.tipo == 'Control Negativo':
+                maximo_control_negativo = np.max(celda.intensidades)
+            intensidades = celda.intensidades
+            plt.plot(intensidades, label=f"Celda {celda.coordenada}, {celda.tipo}")
+        
+        threshold = np.abs(maximo_control_positivo-maximo_control_negativo)*0.5 + maximo_control_negativo
+        plt.axhline(threshold, color='r', linestyle='--', label='Threshold')
+        plt.title(f"Resultados {tratamiento}")
+        plt.xlabel("Tiempo")
+        plt.ylabel("Intensidad")
+        plt.legend(loc="best")
+        plt.grid(True)
+        plt.show()
+
 def sort_key_func(item):
     """
     Función auxiliar para ordenar imágenes basadas en su número ascendentemente.
@@ -139,6 +181,32 @@ def sort_key_func(item):
     :return: Orden de la imagen.
     """
     return int(item.split('_')[-1].split('.png')[0])
+
+def cargar_celdas(datos_interfaz):
+    """
+    Carga las celdas seleccionadas por el usuario.
+    
+    :param datos_interfaz: Datos de las celdas seleccionadas por el usuario.
+    :return: celdas: Lista de celdas seleccionadas.
+    """
+    
+    celdas = []
+
+    for tratamiento, coordenadas_seleccionadas in datos_interfaz.items():
+        #tratamiento = int(tratamiento[-1])
+        for tipo, coordenadas in coordenadas_seleccionadas.items():
+            if coordenadas is not None:
+                if type(coordenadas) == list:
+                    for coordenada in coordenadas:
+                        nueva_celda = Celda(tipo, coordenada, tratamiento)
+                        celdas.append(nueva_celda)
+                # para el control positivo y negativo (solo una celda)
+                elif type(coordenadas) == tuple:
+                    nueva_celda = Celda(tipo, coordenadas, tratamiento)
+                    celdas.append(nueva_celda)
+
+    return celdas
+
 
 def main():
     """
@@ -157,25 +225,15 @@ def main():
     dimension_x, dimension_y = 9, 5 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
 
     data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
-    print(data)
 
     # ETAPA 1: DETECCION DE CELDAS
     # pedir al usuario las celdas seleccionadas
-    coordenadas_seleccionadas = interfaz.main()
-    print(coordenadas_seleccionadas)
+    datos_interfaz = interfaz.main()
+    numero_tratamientos = len(datos_interfaz)
+    print(datos_interfaz)
     
-    celdas = []
-
-    for tipo, coordenadas in coordenadas_seleccionadas.items():
-        if coordenadas is not None:
-            if type(coordenadas) == list:
-                for coordenada in coordenadas:
-                    nueva_celda = Celda(tipo, coordenada)
-                    celdas.append(nueva_celda)
-            # esto pasa cuando CP o CN solo puedo tener un valor, y no está en un singleton sino que es una tupla.
-            elif type(coordenadas) == tuple:
-                nueva_celda = Celda(tipo, coordenadas)
-                celdas.append(nueva_celda)
+    
+    celdas = cargar_celdas(datos_interfaz)
 
     # se obtiene la imagen inicial en gris porque se requiere para la detección de circulos
     img_inicial_gris = io.imread(data[0], as_gray=True) 
@@ -216,7 +274,7 @@ def main():
             celda.agregar_intensidad(valor)
 
     # ETAPA 3: GRAFICAR CADA CELDA CON FUNCIÓN DEL TIEMPO
-    graficar_intensidad_tiempo(celdas)
+    graficar_intensidad_tiempo(celdas, numero_tratamientos)
 
 
 if __name__ == "__main__":
