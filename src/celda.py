@@ -13,6 +13,7 @@ class Celda:
         self.circulo = circulo  # Información del círculo detectado, si es que se ha detectado.
         self.intensidades = []  # Lista para guardar las intensidades a lo largo del tiempo
         self.tratamiento = tratamiento
+        self.estado = 'inicial'
         #self.nombre = nombre  # ej. 'SARS-Cov'
 
     def agregar_intensidad(self, valor):

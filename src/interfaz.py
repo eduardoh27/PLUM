@@ -23,6 +23,7 @@ class App:
         self.ensayo_btn = tk.Button(self.root, text="Ensayo", width=10, height=2, command=lambda: self.set_mode("Ensayo"))
         self.ensayo_btn.grid(row=2, column=9)
 
+        # PARAMETROS MANUALES
         dimention_x, dimention_y = 9, 5
 
         # Crear botones para las celdas
@@ -90,7 +91,7 @@ class App:
     def get_selected_cells(self):
         sorted_cells = sorted(self.selected_cells, key=lambda x: (x[0], x[1]))
         results = {
-            "Celdas": [(i+1, j+1) for i, j in sorted_cells],
+            "Muestras": [(i+1, j+1) for i, j in sorted_cells],
             "Control Positivo": None if not self.control_pos_cell else (self.control_pos_cell[0] + 1, self.control_pos_cell[1] + 1),
             "Control Negativo": None if not self.control_neg_cell else (self.control_neg_cell[0] + 1, self.control_neg_cell[1] + 1)
         }
