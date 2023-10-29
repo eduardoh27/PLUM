@@ -184,12 +184,11 @@ if __name__ == "__main__":
 # TODO: graficar controlPos y controlNeg
 # TODO: reducir ruido
 # TODO: interfaz sea user-friendly
-# TODO: dos CP y dos CN
 # TODO: comentar adecuadamente el código
 # TODO: comprobar grafica con ejemplo de dataset
-# TODO: permitir múltiples CP y CN
 # TODO: garantizar una sola detección en get_circle
 # TODO: manejo de errores: si no se detecta un único circulo        
 # TODO: permitir nombrar? cada celda seleccionada
+# TODO: forzar a usuario a seleccionar un CP y un CN
 # TODO: intensidad en solo canal verde?
 # TODO: exportar información a Excel
