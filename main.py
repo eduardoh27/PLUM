@@ -9,6 +9,17 @@ from celda import Celda
 
 # Función que devuelve la sección de la imagen correspondiente a la muestra en la posición (i, j) de la grilla
 def obtener_imagen_celda(img, i, j, alto_celda, ancho_celda): # fila, columna (empieza en 1)
+    """
+    Obtiene una sub-imagen de la imagen principal según las coordenadas (i, j) en la grilla.
+    
+    :param img: La imagen principal de la que se quiere extraer una celda/sub-imagen.
+    :param i: Coordenada de fila en la grilla.
+    :param j: Coordenada de columna en la grilla.
+    :param alto_celda: Altura de una celda en píxeles.
+    :param ancho_celda: Ancho de una celda en píxeles.
+    :return: new_img: La sub-imagen extraída.
+    """
+    
     if len(img.shape) == 3:
         new_img = img[int(alto_celda*(i-1)):int(alto_celda*i), int(ancho_celda*(j-1)):int(ancho_celda*j), :]
     elif len(img.shape) == 2:
@@ -18,7 +29,18 @@ def obtener_imagen_celda(img, i, j, alto_celda, ancho_celda): # fila, columna (e
 # Función que detecta los círculos en la imagen. Se deben tunear param1 y param2 para reducir FN y/o FP. 
 # Así mismo, minRadius y maxRadius se tunean dependiendo del tamaño de la grilla y muestras utilizadas. 
 def obtener_circulos(imagen, param1=100, param2=8, minRadius=10, maxRadius=16, plotear=False):
+    """
+    Detecta círculos en una imagen usando el algoritmo HoughCircles.
     
+    :param imagen: La imagen en la que se quiere detectar los círculos.
+    :param param1: Parámetro 1 para la detección de círculos.
+    :param param2: Parámetro 2 para la detección de círculos.
+    :param minRadius: Radio mínimo para los círculos detectados.
+    :param maxRadius: Radio máximo para los círculos detectados.
+    :param plotear: Booleano para decidir si mostrar o no la imagen con círculos detectados.
+    :return: circulos[0,0]: Retorna las coordenadas del círculo detectado.
+    """
+        
     # se copia para no alterar la imagen original
     imagen = imagen.copy()
     imagen = img_as_ubyte(imagen)
@@ -49,11 +71,25 @@ def obtener_circulos(imagen, param1=100, param2=8, minRadius=10, maxRadius=16, p
     return circulos[0,0]
 
 def plot(img):
+    """
+    Muestra una imagen dada.
+    
+    :param img: Imagen a mostrar.
+    """
     plt.imshow(img)
     plt.axis('off') 
     plt.show()
 
 def calcular_intensidad(img, circulo, metodo = None):
+    """
+    Calcula la intensidad de un círculo en una imagen.
+    
+    :param img: Imagen que contiene el círculo.
+    :param circulo: Coordenadas del círculo en la imagen.
+    :param metodo: Método a usar para calcular la intensidad (media, maximo, minimo, mediana).
+    :return: intensidad: Valor de la intensidad calculada.
+    """
+        
     i, j, r = circulo
     # se toma la ventana de interes (el cuadrado que enmarca el circulo detectado):
     ventana = img[j-r:j+r, i-r:i+r, 1] # solo se toman las intensidades del canal G (verde)
@@ -76,8 +112,11 @@ def calcular_intensidad(img, circulo, metodo = None):
 
 def graficar_intensidad_tiempo(celdas):
     """
-    Función que grafica la intensidad promedio de cada celda en función del tiempo.
+    Grafica la intensidad de cada celda en función del tiempo.
+    
+    :param celdas: Lista de celdas con sus respectivas intensidades a lo largo del tiempo.
     """
+    
     plt.figure(figsize=(12, 8))
     
     # Por cada celda en celdas_datos
@@ -93,9 +132,18 @@ def graficar_intensidad_tiempo(celdas):
     plt.show()
 
 def sort_key_func(item):
+    """
+    Función auxiliar para ordenar imágenes basadas en su nombre.
+    
+    :param item: Nombre del archivo de imagen.
+    :return: Orden de la imagen.
+    """
     return int(item.split('_')[-1].split('.png')[0])
 
 def main():
+    """
+    Función principal que ejecuta el proceso de detección de celdas, recolección de datos y gráfica de intensidades.
+    """
 
     #PARAMETROS MANUALES
     
@@ -175,6 +223,7 @@ if __name__ == "__main__":
     main()
     
 # AL FINAL
+# TODO: comentar el código
 # TODO: lanzar como un ejecutable (.exe) para comodidad en vez de tener que instalar librerías y ejecutar desde consola 
 # TODO: al final del proyecto: revisar versiones de librerías y colocarlas en requirements.txt
 # TODO: añadir licencia
@@ -184,7 +233,6 @@ if __name__ == "__main__":
 # TODO: graficar controlPos y controlNeg
 # TODO: reducir ruido
 # TODO: interfaz sea user-friendly
-# TODO: comentar adecuadamente el código
 # TODO: comprobar grafica con ejemplo de dataset
 # TODO: garantizar una sola detección en get_circle
 # TODO: manejo de errores: si no se detecta un único circulo        
