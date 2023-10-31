@@ -131,13 +131,13 @@ def graficar_intensidad_tiempo_tratamientos(tratamientos):
             plt.plot(intensidades, label=f"Celda {celda.coordenada}, {celda.tipo}")
 
         for celda in [tratamiento.control_positivo, tratamiento.control_negativo]:
-            intensidades = celda.intensidades
-            plt.plot(intensidades, label=f"Celda {celda.coordenada}, {celda.tipo}")
+            if celda is not None:
+                intensidades = celda.intensidades
+                plt.plot(intensidades, label=f"Celda {celda.coordenada}, {celda.tipo}")
 
         threshold = tratamiento.calcular_threshold()
         if threshold is not None:
-            print(f'Threshold: {threshold}')
-        plt.axhline(threshold, color='r', linestyle='--', label='Threshold')
+            plt.axhline(threshold, color='r', linestyle='--', label='Threshold')
         plt.title(f"Resultados {tratamiento.nombre}")
         plt.xlabel("Tiempo")
         plt.ylabel("Intensidad")
@@ -203,7 +203,7 @@ def main():
 
     pixel_x_1, pixel_y_1 = 120, 80 # esquina superior izquierda de la imagen recortada
     pixel_x_2, pixel_y_2 = 620, 345 # esquina inferior derecha de la imagen recortada
-    dimension_x, dimension_y = 4, 3 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
+    dimension_x, dimension_y = 9, 5 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
 
     data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
 
@@ -262,3 +262,4 @@ if __name__ == "__main__":
 # TODO: colocar resultado de cada celda (positivo o negativo o error?)
 # TODO: definir método de intensidad 
 # TODO: definir método de threshold (pedir porcentaje a usuario?)
+# TODO: permitir cambiar el threshold después de mostrar la gráfica al usuario
