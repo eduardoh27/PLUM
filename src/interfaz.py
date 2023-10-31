@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import messagebox
 
 class App:
-    def __init__(self, root):
+    def __init__(self, root, dimensiones):
         self.root = root
         self.root.title("Seleccionar Celdas")
 
@@ -23,22 +23,21 @@ class App:
         self.ensayo_btn = tk.Button(self.root, text="Ensayo", width=10, height=2, command=lambda: self.set_mode("Ensayo"))
         self.ensayo_btn.grid(row=2, column=9)
 
-        # PARAMETROS MANUALES
-        dimention_x, dimention_y = 9, 5
+        dimension_x, dimension_y = dimensiones
 
         # Crear botones para las celdas
-        for i in range(dimention_y):
-            for j in range(dimention_x):
+        for i in range(dimension_y):
+            for j in range(dimension_x):
                 btn = tk.Button(self.root, text=f"{i+1},{j+1}", width=10, height=3, command=lambda i=i, j=j: self.toggle_cell(i, j))
                 btn.grid(row=i, column=j)
                 self.buttons[(i, j)] = btn
 
         # Botones de control
         self.ok_btn = tk.Button(self.root, text="OK", command=self.ok_pressed)
-        self.ok_btn.grid(row=dimention_y, column=3, columnspan=2)
+        self.ok_btn.grid(row=dimension_y, column=3, columnspan=2)
         
         self.back_btn = tk.Button(self.root, text="Regresar", command=self.reset_selection)
-        self.back_btn.grid(row=dimention_y, column=5, columnspan=2)
+        self.back_btn.grid(row=dimension_y, column=5, columnspan=2)
 
 
     def set_mode(self, mode):
@@ -110,7 +109,8 @@ class DialogoNumeroTratamientos(tk.Toplevel):
         self.resultado = valor
         self.destroy()
 
-def main():
+def main(dimensiones):
+
     root = tk.Tk()
     root.withdraw()  # Ocultar la ventana principal
 
@@ -128,7 +128,7 @@ def main():
     # Mostrar la ventana principal
     root.deiconify()
     
-    app = App(root)
+    app = App(root, dimensiones)
     resultados = {}
 
     for tratamiento in range(1, num_tratamientos + 1):

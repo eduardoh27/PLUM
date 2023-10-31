@@ -19,7 +19,6 @@ def obtener_imagen_celda(img, i, j, alto_celda, ancho_celda): # fila, columna (e
     :param ancho_celda: Ancho de una celda en píxeles.
     :return: new_img: La sub-imagen extraída.
     """
-    
     if len(img.shape) == 3:
         new_img = img[int(alto_celda*(i-1)):int(alto_celda*i), int(ancho_celda*(j-1)):int(ancho_celda*j), :]
     elif len(img.shape) == 2:
@@ -136,7 +135,8 @@ def graficar_intensidad_tiempo_tratamientos(tratamientos):
             plt.plot(intensidades, label=f"Celda {celda.coordenada}, {celda.tipo}")
 
         threshold = tratamiento.calcular_threshold()
-        print(f'Threshold: {threshold}')
+        if threshold is not None:
+            print(f'Threshold: {threshold}')
         plt.axhline(threshold, color='r', linestyle='--', label='Threshold')
         plt.title(f"Resultados {tratamiento.nombre}")
         plt.xlabel("Tiempo")
@@ -203,13 +203,13 @@ def main():
 
     pixel_x_1, pixel_y_1 = 120, 80 # esquina superior izquierda de la imagen recortada
     pixel_x_2, pixel_y_2 = 620, 345 # esquina inferior derecha de la imagen recortada
-    dimension_x, dimension_y = 9, 5 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
+    dimension_x, dimension_y = 4, 3 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
 
     data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
 
     # ETAPA 1: DETECCION DE CELDAS
     # pedir al usuario las celdas seleccionadas
-    datos_interfaz = interfaz.main()
+    datos_interfaz = interfaz.main((dimension_x, dimension_y))
     print(datos_interfaz)
     celdas, tratamientos = cargar_celdas_tratamientos(datos_interfaz)
 
