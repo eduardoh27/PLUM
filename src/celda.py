@@ -24,6 +24,35 @@ class Celda:
         """
         self.intensidades.append(valor)
 
+    def establecer_estado_error(self):
+        """
+        Establece el estado de la celda como error.
+        """
+        self.estado = 'error'
+
+    def establecer_estado_positivo(self):
+        """
+        Establece el estado de la celda como positivo.
+        """
+        self.estado = 'positivo'
+    
+    def establecer_estado_negativo(self):
+        """
+        Establece el estado de la celda como negativo.
+        """
+        self.estado = 'negativo'
+    
+    def establecer_estado_final(self):
+        """
+        Establece el estado de la celda como final.
+        """
+        if self.estado != 'error':
+            mayor_threshold = max(self.intensidades) > self.tratamiento.threshold
+            if mayor_threshold:
+                self.estado = 'positivo'
+            else:
+                self.estado = 'negativo'
+
     def __str__(self):
         """
         Devuelve una representación en cadena de caracteres de la celda.

@@ -62,9 +62,11 @@ def obtener_circulos(imagen, param1=100, param2=8, minRadius=10, maxRadius=16, p
 
     if len(circulos) > 1:
         print('Se detectaron más de un circulo')
+        raise Exception('Se detectaron más de un circulo')
         return None
     elif len(circulos) == 0:
         print('No se detectaron circulos')
+        raise Exception('No se detectaron circulos')
         return None
 
     return circulos[0,0]
@@ -109,7 +111,7 @@ def calcular_intensidad(img, circulo, metodo = None):
 
     return intensidad
 
-def graficar_intensidad_tiempo_tratamientos(tratamientos):
+def graficar_intensidad_tiempo_tratamientos(tratamientos, porcentaje=None):
     """
     Grafica la intensidad de cada celda en función del tiempo.
     
@@ -125,7 +127,7 @@ def graficar_intensidad_tiempo_tratamientos(tratamientos):
     
     for tratamiento in tratamientos:
         plt.figure(figsize=(12, 8))
-
+        
         for celda in tratamiento.muestras:
             intensidades = celda.intensidades
             plt.plot(intensidades, label=f"Celda {celda.coordenada}, {celda.tipo}")
@@ -138,12 +140,47 @@ def graficar_intensidad_tiempo_tratamientos(tratamientos):
         threshold = tratamiento.calcular_threshold()
         if threshold is not None:
             plt.axhline(threshold, color='r', linestyle='--', label='Threshold')
+
         plt.title(f"Resultados {tratamiento.nombre}")
         plt.xlabel("Tiempo")
         plt.ylabel("Intensidad")
         plt.legend(loc="best")
         plt.grid(True)
         plt.show()
+
+def graficar_intensidad_tiempo_tratamiento(tratamiento, porcentaje=None):
+    """
+    Grafica la intensidad de cada celda en función del tiempo.
+    
+    :param celdas: Lista de celdas con sus respectivas intensidades a lo largo del tiempo.
+    :param numero_tratamientos: Número de tratamientos.
+    """
+
+    # Si se especifica un porcentaje, se vuelve a concluír el tratamiento con el nuevo threshold
+    if porcentaje is not None:
+        threshold = tratamiento.concluir_tratamiento(porcentaje)
+    else:
+        threshold = tratamiento.threshold
+
+    plt.figure(figsize=(12, 8))
+    
+    for celda in tratamiento.muestras:
+        intensidades = celda.intensidades
+        plt.plot(intensidades, label=f"Celda {celda.coordenada}, {celda.tipo}")
+
+    for celda in tratamiento.obtener_controles():
+        intensidades = celda.intensidades
+        plt.plot(intensidades, label=f"Celda {celda.coordenada}, {celda.tipo}")
+
+    if threshold is not None:
+        plt.axhline(threshold, color='r', linestyle='--', label='Threshold')
+
+    plt.title(f"Resultados {tratamiento.nombre}")
+    plt.xlabel("Tiempo")
+    plt.ylabel("Intensidad")
+    plt.legend(loc="best")
+    plt.grid(True)
+    plt.show()
 
 def sort_key_func(item):
     """
@@ -172,16 +209,16 @@ def cargar_celdas_tratamientos(datos_interfaz):
             if coordenadas is not None:
                 if type(coordenadas) == list:
                     for coordenada in coordenadas:
-                        nueva_celda = Celda(tipo, coordenada, nombre_tratamiento)
+                        nueva_celda = Celda(tipo, coordenada, nuevo_tratamiento)
                         celdas.append(nueva_celda)
                         nuevo_tratamiento.agregar_muestra(nueva_celda)
                 # para el control positivo y negativo (solo una celda)
                 elif tipo == 'Control Positivo':
-                    nueva_celda = Celda(tipo, coordenadas, nombre_tratamiento)
+                    nueva_celda = Celda(tipo, coordenadas, nuevo_tratamiento)
                     celdas.append(nueva_celda)
                     nuevo_tratamiento.agregar_control_positivo(nueva_celda)
                 elif tipo == 'Control Negativo':
-                    nueva_celda = Celda(tipo, coordenadas, nombre_tratamiento)
+                    nueva_celda = Celda(tipo, coordenadas, nuevo_tratamiento)
                     celdas.append(nueva_celda)
                     nuevo_tratamiento.agregar_control_negativo(nueva_celda)
                 
@@ -205,7 +242,11 @@ def main():
     pixel_x_2, pixel_y_2 = 620, 345 # esquina inferior derecha de la imagen recortada
     dimension_x, dimension_y = 9, 5 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
 
-    data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
+    try:
+        data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
+    except: 
+        print("No se encontró la carpeta 'data-img_44' en la carpeta 'data'.")
+        return
 
     # ETAPA 1: DETECCION DE CELDAS
     # pedir al usuario las celdas seleccionadas
@@ -223,8 +264,13 @@ def main():
     for celda in celdas:
         i, j = celda.coordenada
         img_celda = obtener_imagen_celda(img_inicial_gris, i, j, alto_celda, ancho_celda)
-        circulo = obtener_circulos(img_celda, plotear=False)
-        celda.circulo = circulo
+        try:
+            circulo = obtener_circulos(img_celda, plotear=False)
+        except:
+            print("No se pudo detectar un unico circulo en la celda", celda.coordenada)
+            celda.establecer_estado_error()
+        else:
+            celda.circulo = circulo
     
     # ETAPA 2: RECOLECCION DE DATOS 
     #for t, ruta_imagen in enumerate(data): # útil en caso de necesitar el tiempo (discreto empezando en 0) de cada imagen en el dataset
@@ -239,6 +285,10 @@ def main():
             valor = calcular_intensidad(img_celda, circulo)
             celda.agregar_intensidad(valor)
     
+    # Por ultimo, se calcula el threshold  y se determinan los resultados de cada muestra para cada tratamiento
+    for tratamiento in tratamientos:
+        tratamiento.concluir_tratamiento()
+    
     # ETAPA 3: GRAFICAR CADA CELDA EN FUNCIÓN DEL TIEMPO
     graficar_intensidad_tiempo_tratamientos(tratamientos)
 
@@ -252,14 +302,15 @@ if __name__ == "__main__":
 # TODO: añadir licencia
 
 # TODO: interfaz sea user-friendly
-# TODO: garantizar una sola detección en get_circle
-# TODO: manejo de errores: si no se detecta un único circulo        
 # TODO: permitir nombrar? cada celda seleccionada
 # TODO: forzar a usuario a seleccionar un CP y un CN
 # TODO: intensidad en solo canal verde?
-# TODO: exportar información a Excel y guardar gráficas
 # TODO: reducir ruido de la grafica (con filtro?)
-# TODO: colocar resultado de cada celda (positivo o negativo o error?)
 # TODO: definir método de intensidad 
 # TODO: definir método de threshold (pedir porcentaje a usuario?)
 # TODO: permitir cambiar el threshold después de mostrar la gráfica al usuario
+
+# TODO: exportar información a Excel y guardar gráficas
+# TODO: colocar resultado de cada celda (positivo o negativo o error?)
+# TODO: garantizar una sola detección en get_circle
+# TODO: manejo de errores: si no se detecta un único circulo  

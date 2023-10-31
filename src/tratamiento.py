@@ -16,7 +16,7 @@ class Tratamiento:
     def agregar_control_negativo(self, control_negativo):
         self.control_negativo = control_negativo
 
-    def calcular_threshold(self):
+    def calcular_threshold(self, porcentaje=0.5):
         """
         Calcula el threshold para el tratamiento.
         """
@@ -26,9 +26,30 @@ class Tratamiento:
         else:
             maximo_control_positivo = max(self.control_positivo.intensidades)
             maximo_control_negativo = max(self.control_negativo.intensidades)
-            porcentaje = 0.5
             self.threshold = abs(maximo_control_positivo-maximo_control_negativo)*porcentaje + maximo_control_negativo
         return self.threshold
+    
+    def establecer_estado_muestras(self):
+        """
+        Establece el estado de las muestras del tratamiento.
+        """
+        for muestra in self.muestras:
+            muestra.establecer_estado_final()
+    
+    def concluir_tratamiento(self, porcentaje=0.5):
+        """
+        Establece el estado de las muestras del tratamiento.
+        """
+        self.calcular_threshold(porcentaje)
+        if self.threshold is not None:
+            self.establecer_estado_muestras()
+        return self.threshold
+
+    def obtener_controles(self):
+        """
+        Devuelve una lista con los controles del tratamiento.
+        """
+        return [c for c in [self.control_positivo, self.control_negativo] if c is not None]
 
     def __str__(self):
         return f"Tratamiento: nombre = {self.nombre}, # muestras = {len(self.muestras)},\
