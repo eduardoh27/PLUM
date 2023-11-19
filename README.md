@@ -1,10 +1,25 @@
-# PLUM
+# Project PLUM: Tropical Disease Detection Device
 
-Para ejecutar la aplicación, se debe ejecutar el archivo main.py
-Antes de poder ejecutar la aplicación, asegurarse de tener instalado Python y los paquetes que se encuentran en requirements.txt
-También se deben ajustar los parámetros de la función obtener_circulos con base en las imágenes que se obtengan por la cámara (param1, param2, minRadius, maxRadius).
-Además, las imágenes recibidas pueden necesitar ser recortadas o rotadas inicialmente como método de preprocesamiento para resultados más precisos.
+## Overview
 
-En caso de presentar dudas, contactarnos en cualquiera de los siguientes correos electrónicos:
+Welcome to the repository for Project PLUM, an interdisciplinary initiative developed at Universidad de los Andes, Bogotá, Colombia. This project aims to create a low-cost device for the detection of tropical diseases, integrating expertise from the fields of Biological Sciences, Physics, Electronics, and Mechanical Engineering.
+About the Software
+
+## About the Software
+
+This repository contains the software developed for the PLUM device, encompassing the user interface and the image analysis and processing components.
+
+## Installation and Usage
+
+Before running the application, ensure that you have Python installed along with the packages listed in requirements.txt.
+
+To run the application, execute the main.py file in src folder.
+
+### Configuration notes
+-Adjust the parameters of the obtener_circulos function based on the images captured by the camera (param1, param2, minRadius, maxRadius).
+-The received images may need to be initially cropped or rotated as a preprocessing step for more accurate results.
+
+## Support and Contact 
+Should you have any questions or encounter issues, feel free to contact us at the following email addresses:
 - ej.herreraa@uniandes.edu.co
 - s.naranjob@uniandes.edu.co
