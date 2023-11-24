@@ -239,19 +239,19 @@ def main():
     # pixel_x_2, pixel_y_2 = 570, 345 # esquina inferior derecha de la imagen recortada
     # dimension_x, dimension_y = 8, 4 # dimensiones de la grilla de muestras (8 columnas y 4 filas)
 
-    #pixel_x_1, pixel_y_1 = 120, 80 # esquina superior izquierda de la imagen recortada
-    #pixel_x_2, pixel_y_2 = 620, 345 # esquina inferior derecha de la imagen recortada
-    #dimension_x, dimension_y = 9, 5 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
+    pixel_x_1, pixel_y_1 = 120, 80 # esquina superior izquierda de la imagen recortada
+    pixel_x_2, pixel_y_2 = 620, 345 # esquina inferior derecha de la imagen recortada
+    dimension_x, dimension_y = 9, 5 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
     
-    pixel_x_1, pixel_y_1 = 526, 125 # esquina superior izquierda de la imagen recortada
-    pixel_x_2, pixel_y_2 = 1142, 788 # esquina inferior derecha de la imagen recortada
-    dimension_x, dimension_y = 3, 3 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
+    #pixel_x_1, pixel_y_1 = 526, 125 # esquina superior izquierda de la imagen recortada
+    #pixel_x_2, pixel_y_2 = 1142, 788 # esquina inferior derecha de la imagen recortada
+    #dimension_x, dimension_y = 3, 3 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
     
 
     try:
-        #data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
+        data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
         # se invierte la lista y se toman 1 por cada 3
-        data = glob(os.path.join('data', 'exp_prototipo','muestras', '*.JPG'))[::-1][::3]
+        #data = glob(os.path.join('data', 'exp_prototipo','muestras', '*.JPG'))[::-1][::3]
     except: 
         print("No se encontró la carpeta 'data-img_44' en la carpeta 'data'.")
         return
@@ -273,9 +273,9 @@ def main():
         i, j = celda.coordenada
         img_celda = obtener_imagen_celda(img_inicial_gris, i, j, alto_celda, ancho_celda)
         try:
-            #circulo = obtener_circulos(img_celda, plotear=False)
-            circulo = obtener_circulos(img_celda, plotear=True,
-                                       param1=170, param2=20, minRadius=60, maxRadius=70)
+            circulo = obtener_circulos(img_celda, plotear=False)
+            #circulo = obtener_circulos(img_celda, plotear=True,
+            #                           param1=170, param2=20, minRadius=60, maxRadius=70)
             #obtener_circulos(imagen, param1=100, param2=8, minRadius=10, maxRadius=16, plotear=False)
         except:
             print("No se pudo detectar un unico circulo en la celda", celda.coordenada)
