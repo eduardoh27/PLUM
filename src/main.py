@@ -237,14 +237,17 @@ def main():
     try:
         path_data = os.path.join('data', 'data-img_44', 'img*.png')
         data = sorted(glob(path_data), key=sort_key_func)[1:]
-    except: 
-        print("No se encontró la carpeta 'data-img_44' en la carpeta 'data'.")
+        if len(data) == 0:
+            raise Exception(f"No se encontraron imágenes en el directorio especificado: '{path_data}'." \
+                            " Revise que el directorio sea correcto y que las imágenes tengan el formato adecuado")
+    except Exception as e: 
+        print(f'ERROR: {e}')
         return
 
     # ETAPA 1: DETECCION DE CELDAS
     # pedir al usuario las celdas seleccionadas
     datos_interfaz = interfaz.main((dimension_x, dimension_y))
-    print(datos_interfaz)
+    #print(datos_interfaz)
     celdas, tratamientos = cargar_celdas_tratamientos(datos_interfaz)
 
     # se obtiene la imagen inicial en gris para la detección de circulos

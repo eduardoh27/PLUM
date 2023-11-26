@@ -21,7 +21,7 @@ class Tratamiento:
         Calcula el threshold para el tratamiento.
         """
         if self.control_positivo is None or self.control_negativo is None:
-            print("No se puede calcular el threshold sin ambos controles.")
+            print("WARNING: No se puede calcular el threshold sin ambos controles.")
             self.threshold = None
         else:
             maximo_control_positivo = max(self.control_positivo.intensidades)
