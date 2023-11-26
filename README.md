@@ -2,8 +2,9 @@
 
 ## Overview
 
-Welcome to the repository for Project PLUM, an interdisciplinary initiative developed at Universidad de los Andes, Bogotá, Colombia. This project aims to create a low-cost device for the detection of tropical diseases, integrating expertise from the fields of Biological Sciences, Physics, Electronics, and Mechanical Engineering.
-About the Software
+Welcome to the repository for Project PLUM, an interdisciplinary initiative developed at Universidad de los Andes, Bogotá, Colombia. This project aims to create a low-cost device for the detection of tropical diseases by analyzing temporal fluorescence imaging data
+<!---, integrating expertise from the fields of Biological Sciences, Physics, Electronics, and Mechanical Engineering. --->
+
 
 ## About the Software
 
