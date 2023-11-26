@@ -131,12 +131,12 @@ def graficar_intensidad_tiempo_tratamientos(tratamientos, porcentaje=None):
         
         for celda in tratamiento.muestras:
             intensidades = celda.intensidades
-            plt.plot(intensidades, label=f"Celda {celda.coordenada}, {celda.tipo}")
+            plt.plot(intensidades, label=f"Celda {celda.coordenada_alfanumerica}, {celda.tipo}")
 
         for celda in [tratamiento.control_positivo, tratamiento.control_negativo]:
             if celda is not None:
                 intensidades = celda.intensidades
-                plt.plot(intensidades, label=f"Celda {celda.coordenada}, {celda.tipo}")
+                plt.plot(intensidades, label=f"Celda {celda.coordenada_alfanumerica}, {celda.tipo}")
 
         threshold = tratamiento.calcular_threshold()
         if threshold is not None:
@@ -232,13 +232,8 @@ def main():
     """
 
     #PARAMETROS MANUALES (tambien los de la funcion obtener_circulos)
-    # se obtienen por medio de experimentación 
+    # se obtienen por medio de experimentacion con el dispositivo final
     
-    # Para una gradilla 4x8 eran:
-    # pixel_x_1, pixel_y_1 = 120, 135 # esquina superior izquierda de la imagen recortada
-    # pixel_x_2, pixel_y_2 = 570, 345 # esquina inferior derecha de la imagen recortada
-    # dimension_x, dimension_y = 8, 4 # dimensiones de la grilla de muestras (8 columnas y 4 filas)
-
     pixel_x_1, pixel_y_1 = 120, 80 # esquina superior izquierda de la imagen recortada
     pixel_x_2, pixel_y_2 = 620, 345 # esquina inferior derecha de la imagen recortada
     dimension_x, dimension_y = 9, 5 # dimensiones de la grilla de muestras (9 columnas y 5 filas)

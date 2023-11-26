@@ -10,11 +10,21 @@ class Celda:
         """
         self.tipo = tipo  # ej. 'muestra_normal', 'control_positivo'
         self.coordenada = coordenada  # ej. (2,1)
+        self.coordenada_alfanumerica = self.coordenada_numerica_a_alfanumerica(coordenada)
         self.circulo = circulo  # Información del círculo detectado, si es que se ha detectado.
         self.intensidades = []  # Lista para guardar las intensidades a lo largo del tiempo
         self.tratamiento = tratamiento
         self.estado = 'inicial'
         #self.nombre = nombre  # ej. 'SARS-Cov'
+
+    @staticmethod
+    def coordenada_numerica_a_alfanumerica(coordenada):
+        """
+        Convierte una coordenada numérica (ej. (2,1)) a una coordenada alfanumérica (ej. 'A2').
+        """
+        letras = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+        return f'{letras[coordenada[0]-1]}{coordenada[1]}'
+
 
     def agregar_intensidad(self, valor):
         """

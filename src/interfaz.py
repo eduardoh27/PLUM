@@ -24,11 +24,12 @@ class App:
         self.ensayo_btn.grid(row=2, column=9)
 
         dimension_x, dimension_y = dimensiones
+        row_labels = [chr(65 + i) for i in range(dimension_y)] # row_labels = ['A', 'B', 'C', 'D', 'E'] in case dimension_y = 5 
 
         # Crear botones para las celdas
         for i in range(dimension_y):
             for j in range(dimension_x):
-                btn = tk.Button(self.root, text=f"{i+1},{j+1}", width=10, height=3, command=lambda i=i, j=j: self.toggle_cell(i, j))
+                btn = tk.Button(self.root, text=f"{row_labels[i]}{j+1}", width=10, height=3, command=lambda i=i, j=j: self.toggle_cell(i, j))
                 btn.grid(row=i, column=j)
                 self.buttons[(i, j)] = btn
 
@@ -158,4 +159,5 @@ def main(dimensiones):
     return resultados
 
 if __name__ == "__main__":
-    main()
+    dimensiones = (8, 5)
+    main(dimensiones)
