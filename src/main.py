@@ -60,15 +60,11 @@ def obtener_circulos(imagen, param1=100, param2=8, minRadius=10, maxRadius=16, p
         plt.imshow(imagen)
         plt.show()
 
-    #print(len(circulos[0]))
+    # Se maneja el caso en el que no se detecta un único círculo
     if len(circulos[0]) > 1:
-        print('Se detectaron más de un circulo')
-        raise Exception('Se detectaron más de un circulo')
-        return None
+        raise Exception('Se detectaron más de un círculo')
     elif len(circulos[0]) == 0:
-        print('No se detectaron circulos')
-        raise Exception('No se detectaron circulos')
-        return None
+        raise Exception('No se detectaron círculos')
 
     return circulos[0,0]
 
@@ -131,7 +127,7 @@ def graficar_intensidad_tiempo_tratamientos(tratamientos, porcentaje=None):
         
         for celda in tratamiento.muestras:
             intensidades = celda.intensidades
-            plt.plot(intensidades, label=f"Celda {celda.coordenada_alfanumerica}, {celda.tipo}")
+            plt.plot(intensidades, label=f"Celda {celda.coordenada_alfanumerica}, {celda.tipo}, {celda.estado}")
 
         for celda in [tratamiento.control_positivo, tratamiento.control_negativo]:
             if celda is not None:
@@ -237,16 +233,10 @@ def main():
     pixel_x_1, pixel_y_1 = 120, 80 # esquina superior izquierda de la imagen recortada
     pixel_x_2, pixel_y_2 = 620, 345 # esquina inferior derecha de la imagen recortada
     dimension_x, dimension_y = 9, 5 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
-    
-    #pixel_x_1, pixel_y_1 = 526, 125 # esquina superior izquierda de la imagen recortada
-    #pixel_x_2, pixel_y_2 = 1142, 788 # esquina inferior derecha de la imagen recortada
-    #dimension_x, dimension_y = 3, 3 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
-    
 
     try:
-        data = sorted(glob(os.path.join('data', 'data-img_44', 'img*.png')), key=sort_key_func)[1:]
-        # se invierte la lista y se toman 1 por cada 3
-        #data = glob(os.path.join('data', 'exp_prototipo','muestras', '*.JPG'))[::-1][::3]
+        path_data = os.path.join('data', 'data-img_44', 'img*.png')
+        data = sorted(glob(path_data), key=sort_key_func)[1:]
     except: 
         print("No se encontró la carpeta 'data-img_44' en la carpeta 'data'.")
         return
@@ -257,7 +247,7 @@ def main():
     print(datos_interfaz)
     celdas, tratamientos = cargar_celdas_tratamientos(datos_interfaz)
 
-    # se obtiene la imagen inicial en gris porque se requiere para la detección de circulos
+    # se obtiene la imagen inicial en gris para la detección de circulos
     img_inicial_gris = io.imread(data[0], as_gray=True) 
     img_inicial_gris = img_inicial_gris[pixel_y_1:pixel_y_2, pixel_x_1:pixel_x_2] # imagen recortada
     alto_img, ancho_img = img_inicial_gris.shape[0], img_inicial_gris.shape[1] # ancho y alto (en pixeles) de la imagen recortada
@@ -269,11 +259,8 @@ def main():
         img_celda = obtener_imagen_celda(img_inicial_gris, i, j, alto_celda, ancho_celda)
         try:
             circulo = obtener_circulos(img_celda, plotear=False)
-            #circulo = obtener_circulos(img_celda, plotear=True,
-            #                           param1=170, param2=20, minRadius=60, maxRadius=70)
-            #obtener_circulos(imagen, param1=100, param2=8, minRadius=10, maxRadius=16, plotear=False)
-        except:
-            print("No se pudo detectar un unico circulo en la celda", celda.coordenada)
+        except Exception as e:
+            print(f'ERROR: {e} en la celda {celda.coordenada_alfanumerica}')
             celda.establecer_estado_error()
         else:
             celda.circulo = circulo
@@ -284,12 +271,13 @@ def main():
         im = io.imread(ruta_imagen)
         im = im[pixel_y_1:pixel_y_2, pixel_x_1:pixel_x_2, :] # se recorta la imagen     
         for celda in celdas:
-            # obtener los valores de la imagen consultando el circulo
-            circulo = celda.circulo
-            i, j = celda.coordenada
-            img_celda = obtener_imagen_celda(im, i, j, alto_celda, ancho_celda)
-            valor = calcular_intensidad(img_celda, circulo)
-            celda.agregar_intensidad(valor)
+            if celda.estado != 'error':
+                # obtener los valores de la imagen consultando el circulo. Si no se detectó un único círculo, no se calcula la intensidad
+                circulo = celda.circulo
+                i, j = celda.coordenada
+                img_celda = obtener_imagen_celda(im, i, j, alto_celda, ancho_celda)
+                valor = calcular_intensidad(img_celda, circulo)
+                celda.agregar_intensidad(valor)
     
     # Por ultimo, se calcula el threshold  y se determinan los resultados de cada muestra para cada tratamiento
     for tratamiento in tratamientos:

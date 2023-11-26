@@ -1,0 +1,9 @@
+#pixel_x_1, pixel_y_1 = 526, 125 # esquina superior izquierda de la imagen recortada
+#pixel_x_2, pixel_y_2 = 1142, 788 # esquina inferior derecha de la imagen recortada
+#dimension_x, dimension_y = 3, 3 # dimensiones de la grilla de muestras (9 columnas y 5 filas)
+    
+# se invierte la lista y se toman 1 por cada 3
+        #data = glob(os.path.join('data', 'exp_prototipo','muestras', '*.JPG'))[::-1][::3]
+
+circulo = obtener_circulos(img_celda, plotear=True,
+                                    param1=170, param2=20, minRadius=60, maxRadius=70)
