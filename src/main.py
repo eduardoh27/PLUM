@@ -40,7 +40,7 @@ def obtener_circulos(imagen, param1=100, param2=8, minRadius=10, maxRadius=16, p
     :return: circulos[0,0]: Retorna las coordenadas del círculo detectado.
     """
         
-    # se copia para no alterar la imagen original.
+    # se copia para no alterar la imagen original.....
     imagen = imagen.copy()
     imagen = img_as_ubyte(imagen)
 
