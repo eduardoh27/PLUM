@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import messagebox
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class App:
     def __init__(self, root, dimensiones):
@@ -96,6 +97,16 @@ class App:
             "Control Negativo": None if not self.control_neg_cell else (self.control_neg_cell[0] + 1, self.control_neg_cell[1] + 1)
         }
         return results
+    
+    def display_figure(self, fig):
+        # Si ya existe un canvas, lo destruye para crear uno nuevo
+        if hasattr(self, 'canvas'):
+            self.canvas.get_tk_widget().destroy()
+        
+        self.canvas = FigureCanvasTkAgg(fig, master=self.root)  # master es la ventana de Tkinter
+        widget = self.canvas.get_tk_widget()
+        widget.grid(row=3, column=0, columnspan=9)  # Ajusta la ubicación según tu interfaz
+        self.canvas.draw()
 
 
 class DialogoNumeroTratamientos(tk.Toplevel):
@@ -156,7 +167,7 @@ def main(dimensiones):
                 print("Control Negativo:", celdas["Control Negativo"])
             print()
 
-    return resultados
+    return app, resultados
 
 if __name__ == "__main__":
     dimensiones = (8, 5)

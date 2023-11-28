@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from skimage import io, img_as_ubyte
 import numpy as np
 import cv2
@@ -145,6 +146,48 @@ def graficar_intensidad_tiempo_tratamientos(tratamientos, porcentaje=None):
         plt.grid(True)
         plt.show()
 
+def graficar_intensidad_tiempo_tratamientos_test(tratamientos, porcentaje=None):
+    """
+    Grafica la intensidad de cada celda en función del tiempo.
+    
+    :param celdas: Lista de celdas con sus respectivas intensidades a lo largo del tiempo.
+    :param numero_tratamientos: Número de tratamientos.
+    """
+    
+    figuras = []  # Lista para almacenar las figuras creadas
+    numero_tratamientos = len(tratamientos)
+
+    if numero_tratamientos not in [1, 2]:
+        print("Número de tratamientos no soportado.")
+        return None
+    
+    for tratamiento in tratamientos:
+        fig = Figure(figsize=(12, 8))
+        ax = fig.add_subplot(111)
+        
+        for celda in tratamiento.muestras:
+            intensidades = celda.intensidades
+            ax.plot(intensidades, label=f"Celda {celda.coordenada_alfanumerica}, {celda.tipo}, {celda.estado}")
+
+        for celda in [tratamiento.control_positivo, tratamiento.control_negativo]:
+            if celda is not None:
+                intensidades = celda.intensidades
+                ax.plot(intensidades, label=f"Celda {celda.coordenada_alfanumerica}, {celda.tipo}")
+
+        threshold = tratamiento.calcular_threshold(porcentaje) if porcentaje is not None else tratamiento.threshold
+        if threshold is not None:
+            ax.axhline(threshold, color='r', linestyle='--', label='Threshold')
+
+        ax.set_title(f"Resultados {tratamiento.nombre}")
+        ax.set_xlabel("Tiempo")
+        ax.set_ylabel("Intensidad")
+        ax.legend(loc="best")
+        ax.grid(True)
+
+        figuras.append(fig)  # Agrega la figura creada a la lista de figuras
+    
+    return figuras  # Devuelve la lista de figuras
+
 def graficar_intensidad_tiempo_tratamiento(tratamiento, porcentaje=None):
     """
     Grafica la intensidad de cada celda en función del tiempo.
@@ -246,7 +289,7 @@ def main():
 
     # ETAPA 1: DETECCION DE CELDAS
     # pedir al usuario las celdas seleccionadas
-    datos_interfaz = interfaz.main((dimension_x, dimension_y))
+    interfaz_instancia, datos_interfaz = interfaz.main((dimension_x, dimension_y))
     #print(datos_interfaz)
     celdas, tratamientos = cargar_celdas_tratamientos(datos_interfaz)
 
@@ -287,7 +330,12 @@ def main():
         tratamiento.concluir_tratamiento()
     
     # ETAPA 3: GRAFICAR CADA CELDA EN FUNCIÓN DEL TIEMPO
-    graficar_intensidad_tiempo_tratamientos(tratamientos)
+    figuras = graficar_intensidad_tiempo_tratamientos_test(tratamientos)
+    if figuras:
+        interfaz_instancia.display_figure(figuras[0])
+
+    for i in range(int(1e100)):
+        pass
 
 if __name__ == "__main__":
     main()
