@@ -139,10 +139,11 @@ def graficar_intensidad_tiempo_tratamientos(tratamientos, porcentaje=None):
             plt.axhline(threshold, color='r', linestyle='--', label='Threshold')
 
         plt.title(f"Resultados {tratamiento.nombre}")
-        plt.xlabel("Tiempo")
-        plt.ylabel("Intensidad")
+        plt.xlabel("Tiempo (Minutos)")
+        plt.ylabel("Intensidad absoluta")
         plt.legend(loc="best")
         plt.grid(True)
+        #plt.savefig(f"resultados_{tratamiento.nombre}.png")
         plt.show()
 
 def graficar_intensidad_tiempo_tratamiento(tratamiento, porcentaje=None):
